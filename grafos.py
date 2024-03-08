@@ -1,4 +1,4 @@
-# from pprint import pprint
+from pprint import pprint
 
 # Como identificar ciclos ?
 # V= passos ou perguntas
@@ -8,6 +8,10 @@
 
 
 class Vertice:
+    '''
+        Represntação de vértice em python
+    '''
+
     def __init__(self, rotulo: str) -> None:
         self.rotulo = rotulo
         self.right: Vertice | None = None
@@ -18,69 +22,55 @@ class Vertice:
 
 
 class Grapho:
+    '''
+        Represntação de grafo em python
+    '''
+
     def __init__(self) -> None:
         self.grafo: list[Vertice] = []
         self.lista_adjacencia: dict[str, list[Vertice]] = {}
 
     def add_vertice(self, vertice: Vertice):
+        '''
+            Adicionando vértices ao grafos
+        '''
         self.grafo.append(vertice)
         self.lista_adjacencia[vertice.rotulo] = []
 
     def add_aresta_direcionada(self, vertice_primeiro: Vertice,
                                vertice_segundo: Vertice,
-                               direcao: str):
+                               direcao: str = ''):
+        '''
+            Criando as ligações (arestas) entre vértices
+        '''
 
-        self.lista_adjacencia[vertice_primeiro.rotulo].append(vertice_segundo)
+        if vertice_segundo not in (
+                self.lista_adjacencia[vertice_primeiro.rotulo]):
 
-        if (direcao == 'r'):
-            vertice_primeiro.right = vertice_segundo
-        elif (direcao == 'l'):
-            vertice_primeiro.left = vertice_segundo
-        elif (direcao == 's'):
-            vertice_primeiro.right = vertice_primeiro
+            self.lista_adjacencia[vertice_primeiro.rotulo].append(
+                vertice_segundo)
 
+            if (direcao == 'r'):
+                vertice_primeiro.right = vertice_segundo
+            elif (direcao == 'l'):
+                vertice_primeiro.left = vertice_segundo
+            elif (direcao == '' and vertice_primeiro == vertice_segundo):
+                vertice_primeiro.right = vertice_primeiro
 
-a = Vertice('a')
-b = Grapho()
-b.add_vertice(a)
-print(b.grafo)
-
-
-# class Grafo:
-#     '''
-#     Representação de grafos em python
-#     '''
-
-#     def __init__(self, vertices: int) -> None:
-#         self.vertices = vertices
-#         self.rotulos_vertices = str([n for n in range(1, self.vertices + 1)])
-#         self.grafo = [[0]*self.vertices for _ in range(self.vertices)]
-#         self.arestas = 0
-
-#     def add_aresta(self, u: int, v: int):
-#         if u - 1 < len(self.grafo) and v - 1 < len(self.grafo) and (
-#                 self.grafo[u-1][v-1] == 0) and u != v:
-
-#             self.grafo[u-1][v-1] = -1
-#             self.grafo[v-1][u-1] = 1
-#             self.arestas += 1
-
-#         else:
-#             print("Já possui a ligação ou Não existe no grafo")
-
-#     def delete_aresta(self, u: int, v: int):
-#         if u - 1 < len(self.grafo) and v - 1 < len(self.grafo):
-#             self.grafo[u-1][v-1] = 0
-#             self.arestas -= 1
-
-#         else:
-#             print("Já retirou a ligação ou Não existe no grafo")
+            return self.lista_adjacencia
 
 
-# grafo = Grafo(5)
-# grafo.add_aresta(1, 2)
-# grafo.add_aresta(1, 3)
-# grafo.add_aresta(2, 4)
-# grafo.add_aresta(2, 5)
+a = Vertice('A')
+b = Vertice('B')
+c = Vertice('C')
 
-# pprint(grafo.grafo)
+grafo = Grapho()
+grafo.add_vertice(a)
+grafo.add_vertice(b)
+grafo.add_vertice(c)
+grafo.add_aresta_direcionada(a, b, 'l')
+grafo.add_aresta_direcionada(a, a)
+grafo.add_aresta_direcionada(a, b, 'l')
+grafo.add_aresta_direcionada(c, a, 'l')
+
+pprint(grafo.lista_adjacencia)
