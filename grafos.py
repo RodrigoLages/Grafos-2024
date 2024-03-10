@@ -1,4 +1,8 @@
+from ast import Return
 from pprint import pprint
+from tabnanny import verbose
+
+from pymysql import TIME
 
 # Como identificar ciclos ?
 # V= passos ou perguntas
@@ -14,6 +18,7 @@ class Vertice:
 
     def __init__(self, rotulo: str) -> None:
         self.rotulo = rotulo
+        self.verificado: int = 0
         self.right: Vertice | None = None
         self.left: Vertice | None = None
 
@@ -27,19 +32,21 @@ class Grapho:
     '''
 
     def __init__(self) -> None:
-        self.grafo: list[Vertice] = []
+        # Lista dos vértices
+        self.vertices: list[Vertice] = []
+
+        # Apenas uma representação visual do grafo com seus vértices e arestas
         self.lista_adjacencia: dict[str, list[Vertice]] = {}
 
     def add_vertice(self, vertice: Vertice):
         '''
             Adicionando vértices ao grafos
         '''
-        self.grafo.append(vertice)
+        self.vertices.append(vertice)
         self.lista_adjacencia[vertice.rotulo] = []
 
     def add_aresta_direcionada(self, vertice_primeiro: Vertice,
-                               vertice_segundo: Vertice,
-                               direcao: str = ''):
+                               vertice_segundo: Vertice):
         '''
             Criando as ligações (arestas) entre vértices
         '''
@@ -50,27 +57,56 @@ class Grapho:
             self.lista_adjacencia[vertice_primeiro.rotulo].append(
                 vertice_segundo)
 
-            if (direcao == 'r'):
+            if vertice_primeiro.right is None:
                 vertice_primeiro.right = vertice_segundo
-            elif (direcao == 'l'):
+            else:
                 vertice_primeiro.left = vertice_segundo
-            elif (direcao == '' and vertice_primeiro == vertice_segundo):
-                vertice_primeiro.right = vertice_primeiro
 
             return self.lista_adjacencia
 
 
-a = Vertice('A')
-b = Vertice('B')
-c = Vertice('C')
+u = Vertice('U')
+v = Vertice('V')
+w = Vertice('W')
+x = Vertice('X')
+y = Vertice('Y')
+z = Vertice('Z')
 
 grafo = Grapho()
-grafo.add_vertice(a)
-grafo.add_vertice(b)
-grafo.add_vertice(c)
-grafo.add_aresta_direcionada(a, b, 'l')
-grafo.add_aresta_direcionada(a, a)
-grafo.add_aresta_direcionada(a, b, 'l')
-grafo.add_aresta_direcionada(c, a, 'l')
+grafo.add_vertice(u)
+grafo.add_vertice(v)
+grafo.add_vertice(w)
+grafo.add_vertice(x)
+grafo.add_vertice(y)
+grafo.add_vertice(z)
 
-pprint(grafo.lista_adjacencia)
+grafo.add_aresta_direcionada(u, v)
+grafo.add_aresta_direcionada(u, x)
+grafo.add_aresta_direcionada(v, y)
+grafo.add_aresta_direcionada(w, y)
+grafo.add_aresta_direcionada(w, z)
+grafo.add_aresta_direcionada(x, v)
+grafo.add_aresta_direcionada(y, x)
+grafo.add_aresta_direcionada(z, z)
+
+
+def dfs_verification(V: Vertice, TIMES: list[list[int]], PAIS: list, t: int):
+    V.verificado += 1
+    TIMES[t][0] += t + 1
+
+
+def dfs(G: Grapho):
+    QUANTIDADE = len(G.vertices)
+    pais = [None for _ in range(QUANTIDADE)]
+    tempos = [[0, 0] for _ in range(QUANTIDADE)]
+
+    print(G.lista_adjacencia)
+
+    for t, vertice in enumerate(G.vertices):
+        dfs_verification(vertice, tempos, pais, t)
+
+    print(pais)
+    print(tempos)
+
+
+dfs(grafo)
