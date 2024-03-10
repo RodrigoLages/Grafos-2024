@@ -2,8 +2,6 @@ from ast import Return
 from pprint import pprint
 from tabnanny import verbose
 
-from pymysql import TIME
-
 # Como identificar ciclos ?
 # V= passos ou perguntas
 # Arestas= proximo asso ou resposta
@@ -21,6 +19,8 @@ class Vertice:
         self.verificado: int = 0
         self.right: Vertice | None = None
         self.left: Vertice | None = None
+        self.pai: Vertice | None = None
+        self.tempos = [0, 0]
 
     def __repr__(self) -> str:
         return self.rotulo
@@ -89,24 +89,40 @@ grafo.add_aresta_direcionada(x, v)
 grafo.add_aresta_direcionada(y, x)
 grafo.add_aresta_direcionada(z, z)
 
+TEMPO = 0
 
-def dfs_verification(V: Vertice, TIMES: list[list[int]], PAIS: list, t: int):
+def dfs_verification(V: Vertice, G: Grapho):
+    global TEMPO
+    V.verificado += 1 # Vertice descoberto
+    TEMPO += 1
+    V.tempos[0] = TEMPO
+
+    # Checa se á um vertice não descoberto adjacente
+    for adj in G.lista_adjacencia[V.rotulo]:
+        if adj.verificado == 0:
+            adj.pai = V
+            dfs_verification(adj, G) # Caso tenha, atualiza o pai e visita
+
+    # Termina de visitar o vertice 
     V.verificado += 1
-    TIMES[t][0] += t + 1
+    TEMPO += 1
+    V.tempos[1] = TEMPO
 
 
 def dfs(G: Grapho):
-    QUANTIDADE = len(G.vertices)
-    pais = [None for _ in range(QUANTIDADE)]
-    tempos = [[0, 0] for _ in range(QUANTIDADE)]
+    global TEMPO
+    TEMPO = 0
 
     print(G.lista_adjacencia)
 
     for t, vertice in enumerate(G.vertices):
-        dfs_verification(vertice, tempos, pais, t)
+        if vertice.verificado == 0:
+            dfs_verification(vertice, G)
 
-    print(pais)
-    print(tempos)
+    for v in G.vertices:
+        print(v.rotulo)
+        print("pai: ", v.pai)
+        print(v.tempos)
 
 
 dfs(grafo)
